@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import java.util.Arrays;
 
 public class Main {
@@ -19,23 +21,34 @@ public class Main {
         return findAMDAux(message1.toCharArray(), message2.toCharArray(), 0, 0);
     }
 
-    static int findAMDAux(char[] characters1, char[] characters2, int pointer1, int pointer2) {
+    static Triplet findAMDAux(char[] characters1, char[] characters2, int pointer1, int pointer2, Pair<String, String> solution) {
         if (pointer1 == characters1.length) // first message finished
-            return (characters2.length - pointer2) * GAP_PENALTY; // return the rest of message2 length as gap penalties
+            return new Triplet(new String(characters1), new String(characters2), (characters2.length - pointer2) * GAP_PENALTY); // return the rest of message2 length as gap penalties
 
         if (pointer2 == characters2.length) // second message finished
-            return (characters1.length - pointer1) * GAP_PENALTY; // return the rest of message2 length as gap penalties
+            return new Triplet(new String(characters1), new String(characters2), (characters1.length - pointer1) * GAP_PENALTY); // return the rest of message2 length as gap penalties
 
         int cached = getFromCache(characters1.length - pointer1, characters2.length - pointer2);
         if (cached != -1)
-            return cached;
+            return new Triplet(new String(characters1), new String(characters2), cached);
 
         int letterCost = characters1[pointer1] == characters2[pointer2] ? 0 : MISMATCH_PENALTY;
+        String first = solution.getKey();
+        String second = solution.getValue();
 
+        Triplet noGap = letterCost + findAMDAux(characters1, characters2, pointer1 + 1, pointer2 + 1, new Pair<>(first + characters1[pointer1], second + characters2[pointer2]));
+        Triplet gapInSecond = GAP_PENALTY + findAMDAux(characters1, characters2, pointer1 + 1, pointer2, new Pair<>(first + characters1[pointer1], second + "_"));
+        Triplet gapInFirst = GAP_PENALTY + findAMDAux(characters1, characters2, pointer1, pointer2 + 1, new Pair<>(first + "_", second + characters2[pointer2]));
 
-        int amd = Math.min(letterCost + findAMDAux(characters1, characters2, pointer1 + 1, pointer2 + 1), // no gaps
-                Math.min(GAP_PENALTY + findAMDAux(characters1, characters2, pointer1 + 1, pointer2), // gap in message 2
-                        GAP_PENALTY + findAMDAux(characters1, characters2, pointer1, pointer2 + 1))); // gap in message 1
+        Triplet amdSolution;
+
+        if (noGap.getTotal() < gapInFirst.getTotal())
+            if (noGap.getTotal() < gapInSecond.getTotal())
+                amdSolution = new Triplet(noGap)
+
+        int amd = Math.min(letterCost + findAMDAux(characters1, characters2, pointer1 + 1, pointer2 + 1).getTotal(), // no gaps
+                Math.min(GAP_PENALTY + findAMDAux(characters1, characters2, pointer1 + 1, pointer2).getTotal(), // gap in message 2
+                        GAP_PENALTY + findAMDAux(characters1, characters2, pointer1, pointer2 + 1).getTotal())); // gap in message 1
 
         cache[characters1.length - pointer1 - 1][characters2.length - pointer2 - 1] = amd; // cache the result
         return amd;
