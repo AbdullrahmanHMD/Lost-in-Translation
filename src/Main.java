@@ -15,29 +15,33 @@ public class Main {
         System.out.println(findAMD(s1, s2));
     }
 
-    private static int findAMD(String m1, String m2) {
-        if (m1.isEmpty())
-            return m2.length() * GAP_PENALTY;
+    private static int findAMD(String message1, String message2) {
+        return findAMDAux(message1.toCharArray(), message2.toCharArray(), 0, 0);
+    }
 
-        if (m2.isEmpty())
-            return m1.length() * GAP_PENALTY;
+    static int findAMDAux(char[] characters1, char[] characters2, int pointer1, int pointer2) {
+        if (pointer1 == characters1.length) // first message finished
+            return (characters2.length - pointer2) * GAP_PENALTY; // return the rest of message2 length as gap penalties
 
-        int cached = getFromCache(m1, m2);
+        if (pointer2 == characters2.length) // second message finished
+            return (characters1.length - pointer1) * GAP_PENALTY; // return the rest of message2 length as gap penalties
+
+        int cached = getFromCache(characters1.length - pointer1, characters2.length - pointer2);
         if (cached != -1)
             return cached;
 
-        int letterCost = m1.charAt(0) == m2.charAt(0) ? 0 : MISMATCH_PENALTY;
+        int letterCost = characters1[pointer1] == characters2[pointer2] ? 0 : MISMATCH_PENALTY;
 
 
-        int amd = Math.min(letterCost + findAMD(m1.substring(1), m2.substring(1)),
-                Math.min(GAP_PENALTY + findAMD(m1.substring(1), m2),
-                        GAP_PENALTY + findAMD(m1, m2.substring(1))));
+        int amd = Math.min(letterCost + findAMDAux(characters1, characters2, pointer1 + 1, pointer2 + 1), // no gaps
+                Math.min(GAP_PENALTY + findAMDAux(characters1, characters2, pointer1 + 1, pointer2), // gap in message 2
+                        GAP_PENALTY + findAMDAux(characters1, characters2, pointer1, pointer2 + 1))); // gap in message 1
 
-        cache[m1.length() - 1][m2.length() - 1] = amd;
+        cache[characters1.length - pointer1 - 1][characters2.length - pointer2 - 1] = amd; // cache the result
         return amd;
     }
 
-    private static Integer getFromCache(String s1, String s2) {
-        return cache[s1.length() - 1][s2.length() - 1];
+    private static Integer getFromCache(int s1, int s2) {
+        return cache[s1 - 1][s2 - 1];
     }
 }
