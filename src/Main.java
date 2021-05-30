@@ -1,60 +1,104 @@
-import javafx.util.Pair;
-
 import java.util.Arrays;
 
 public class Main {
     private static final int GAP_PENALTY = 2;
     private static final int MISMATCH_PENALTY = 1;
 
-    static int[][] cache;
+    static char[] characters1;
+    static char[] characters2;
+
+    static int[][] amdCache;
+    static String[][] message1Cache;
+    static String[][] message2Cache;
 
     public static void main(String[] args) {
-        String s1 = "BZFBZDBBFFDFBDFFBDBFBBBBDZFFZBFZBFFBDZFFBFBZZFFZBDDFDFBBFFZZFDDFDZZZBFZBFFFFBBFZZDZFDDDFBDFFZBZFFZDBBZBZDBZZFFDFZFFFDBFDZFDDDFZDFDFZFFZBZFFBZBBBFFDFFFFZFBBDFBDDZDFBBZDDFZFFZDBBFZFDFZBDBBDFDFDDBZZFBDDBFFDBFBBZZFBZFFDBFBZZFZDBFBZDZDZZDFFZBZBZDZFFDFDZZZDZFFZBBFDBDBZDBFDZFDDBFBBZFBBBZZFFZBZFFZFDDZBZZZDZFBBFBBFBBFZFBDFDBBFBBFBZFZFFBBBBDFZDFZDDBZBDDFDFBBBZDFFZFDFZFZFDFDFBZFBFDBZDFZFZFDZFDBZFZFBZDDDFDBBFBFZBZFDFBZZFBDZBZDBFFBBFFFBZDBBFBBZDDFFZBFFBDZZZDFFFDFZFDFFBZFDBFFDBBBBFZFDBDDZFBZDBDBZFZDBDBBDFBZBZFFDFBBBBBDBZDFZDBBBFDFFZZFBBDFZZFZFFFDZFBBBFZZFBDDBBDZFBZBZZZFDDFFBDZFFDBZDBBFZZBZZDFFZBZZFBDFFBBFBZFBBDFZFBBDZFFFZFZDZFDFZDFZDFBZBZDFFZFFZFFZBDBBZFFBZBZDFDDFZZZBZBDDFFZFFFFDBZZFDFDDBDBDZBBFFZBBZZDDZZBZFDZFFDBBZFZDFZFBDDBFZFBZBZDFDZZBDFDDZZZFFDBDFDDFDDBBFDFBDFDDFBBFDFBZZBBBFZZDFDDBDFFZZFZFDFDZFFFZZDDBZDFZZFFBBBBFBZFBFBFDFZFFBBFZFDDFBFDFZBFFZFFZDFZDDFDDBDFFBFZDZFDBBDFZDBFBDBDZFFDBFBFFZFBZDFBFDDFDFDZBZBDDFBFDZFDZDBBDDZFFZDBBDFBBFBFBZBZZFDBFZZFDBFFBBBBFDZZDFDDBBDBBFFFFZZBBBDBZDBDDZFFDFFDBFFDBZZFZBZZBBDDFFZFFDFDBFDFDBFBZDFBBFFZDZZFDBFDDZFZFDZDBFDFDFZFZZZDBZBDFDBBFZFDFZBZDFFDFDFDDFDZFBBDBZZBDDFFZZZBBDFFBZZBZFDZDBFFBFDDFZBZZBZZDFBDFFDFFZFFFBZZFDZZDBDZBZFFFBBBFBFZDBDBZDZZBBDFFZFBBFDZFBBFZBFBBBBBDFZFZZBDBFDBZDBFZZFFDZDFZFFBZDBBFDFBDZDBBZBFZZFFDZFDFBBBBFBFZZZZBB";
-        String s2 = "FZFDFDDBFDDDFDDBZDFDFFDDFZDFBZDZFFFDFDFZDFBBFFZFBDFZFDZZDBZDBZFBBFFDZFBDFFDFZDDBDDFFFBZBBDDFDBDZDZFBDFBDDFDFFFZFZFFFDZBZFZFDBFZDFDFDFFDFZFDFDFFDFFDFDFBZDFZDBBZDZFFBDFBFFDDFDDDBFFDFBZDFDDDBFFDDFZFFBFDFDFDDFBFBDDFZFFDDFFDFZDBFDFZDDBFFFDFZDBFDFZDZFDBDDFDDFFDFFDDBFDZFFDDBFDDBDDFDFZFDBDBDDDBFFZDZDFDZFFFDFDDDFZDDFBZDFFDFBDFFDFBDDZFZDFDFDFDDBZDFDDZDFFDDDZFFDDDBFFZDDFDBZZDDFFFDDFDBBFDDFBZDDBDDZDDZFDDDBZDFDDZFFZDFFZDFBDFFZDBFDFDFFDBZDDFZFBZDDDDFDFDDBZFZZDFFDDFDFDDDZFFFFDZFFBFDZFDZFFZFFZDZDFFZDBBDFBFBBDBZDZZDDBDBDDDZFFDDDBDZFDFZFFBFDFDFDDDBDDZFZDFZZDFBFFFFBZZFZDFDZFDFDDDZZDFDDZDFFDDDZFFDFFDDDZFFBBFBFFBDFBFBZFFBZDZFFFDFDDFZDZFDBZDFBDBZFFFDFFDFFDZDFBDDZDFFZFFDFFZFZZDBBDBBZFFDFDFDZDZFDDBDFZDFBDBFDDZFFDDFZDFFDFFDFFZDBDFZFBDDDBFFBDBZDFDFDFDFFDDZFDBFBDDZDFFZDFZFFFDFDDFBFDFDBZDBBFBDDDZFDBZFFDBFDFDDBZDFDDZDFFDDBBDFBFFBZDFZFBFBZFBZDFBFFDFDDFDDFDFZFFDFBDFBZDDFFFDFDFFFZDDFFZFBZDFDZDDFDFDBFDZZFDZDBBFFFDBZDBZDDBFDDFDFDFZDFBBFBFBDDDZFFBBDZFDZFDFDFBFDFDDZFBBFFDDZDFFFDFDFDDFFZDFBFDDFFFDFDFFFDBZDFZFDZFBDDFFDFFDFDDBFDDBFDZFFDDFFZFZFDFDFBBFZFFDDFZFDFDFZDZZDFBDDFZDDDFZZDFDDZFFFZDFZDDFDFDDFFFZFDDFDBZDZFFDDFBDFDDFDFZDFFFDDDFFDDZZDZFDFDDFDDFDDFFDFZDDZFDBDDFZBDDFDDZZZFFDDDFDFDFBFFDFFZDZDFZDDBBFFDDDZFFDDFFDFFDFZFFDZDFDBBFDFZDDDBZDFBDDDDBBDFDDBFDDDFBZFFDDBBFFDFFDDFDDZFFDZFDFDFBDBBZDZDZBB";
-        cache = new int[s1.length()][s2.length()];
-        for (int[] a : cache)
-            Arrays.fill(a, -1);
-        System.out.println(findAMD(s1, s2));
+        String s1 = "ZBDBFZZBDD";
+        String s2 = "ZBBFFZDB";
+        amdCache = new int[s1.length()][s2.length()];
+        message1Cache = new String[s1.length()][s2.length()];
+        message2Cache = new String[s1.length()][s2.length()];
+        for (int i = 0; i < amdCache.length; i++) {
+            Arrays.fill(amdCache[i], -1);
+            Arrays.fill(message1Cache[i], null);
+            Arrays.fill(message1Cache[i], null);
+        }
+        Triplet amdResult = findAMD(s1, s2);
+
+        String result = String.format("Minimum penalty: %d\nMessage 1:\n\t%s\nMessage 2:\n\t%s\n",
+                amdResult.getAmd(),
+                amdResult.getMessage1(),
+                amdResult.getMessage2());
+
+        System.out.println(result);
     }
 
-    private static int findAMD(String message1, String message2) {
-        return findAMDAux(message1.toCharArray(), message2.toCharArray(), 0, 0);
+    private static Triplet findAMD(String message1, String message2) {
+        characters1 = message1.toCharArray();
+        characters2 = message2.toCharArray();
+        return findAMDAux(0, 0);
     }
 
-    static Triplet findAMDAux(char[] characters1, char[] characters2, int pointer1, int pointer2, Pair<String, String> solution) {
+    static Triplet findAMDAux(int pointer1, int pointer2) {
         if (pointer1 == characters1.length) // first message finished
-            return new Triplet(new String(characters1), new String(characters2), (characters2.length - pointer2) * GAP_PENALTY); // return the rest of message2 length as gap penalties
+            return new Triplet(getGapsString(characters2.length - pointer2), getStringFromCharacters(characters2, pointer2), (characters2.length - pointer2) * GAP_PENALTY); // return the rest of message2 length as gap penalties
 
         if (pointer2 == characters2.length) // second message finished
-            return new Triplet(new String(characters1), new String(characters2), (characters1.length - pointer1) * GAP_PENALTY); // return the rest of message2 length as gap penalties
+            return new Triplet(getStringFromCharacters(characters1, pointer1), getGapsString(characters1.length - pointer1), (characters1.length - pointer1) * GAP_PENALTY); // return the rest of message2 length as gap penalties
 
-        int cached = getFromCache(characters1.length - pointer1, characters2.length - pointer2);
-        if (cached != -1)
-            return new Triplet(new String(characters1), new String(characters2), cached);
+        Triplet cached = getFromCache(characters1.length - pointer1, characters2.length - pointer2);
+        if (cached != null)
+            return cached;
 
-        int letterCost = characters1[pointer1] == characters2[pointer2] ? 0 : MISMATCH_PENALTY;
-        String first = solution.getKey();
-        String second = solution.getValue();
+        int noGapCost = characters1[pointer1] == characters2[pointer2] ? 0 : MISMATCH_PENALTY;
 
-        Triplet noGap = letterCost + findAMDAux(characters1, characters2, pointer1 + 1, pointer2 + 1, new Pair<>(first + characters1[pointer1], second + characters2[pointer2]));
-        Triplet gapInSecond = GAP_PENALTY + findAMDAux(characters1, characters2, pointer1 + 1, pointer2, new Pair<>(first + characters1[pointer1], second + "_"));
-        Triplet gapInFirst = GAP_PENALTY + findAMDAux(characters1, characters2, pointer1, pointer2 + 1, new Pair<>(first + "_", second + characters2[pointer2]));
+        Triplet noGap = findAMDAux(pointer1 + 1, pointer2 + 1);
+        Triplet gapInFirst = findAMDAux(pointer1, pointer2 + 1);
+        Triplet gapInSecond = findAMDAux(pointer1 + 1, pointer2);
 
-        Triplet amdSolution;
+        int amdCost = Math.min(noGapCost + noGap.getAmd(), // no gaps
+                Math.min(GAP_PENALTY + gapInSecond.getAmd(), // gap in message 2
+                        GAP_PENALTY + gapInFirst.getAmd())); // gap in message 1
 
-        if (noGap.getTotal() < gapInFirst.getTotal())
-            if (noGap.getTotal() < gapInSecond.getTotal())
-                amdSolution = new Triplet(noGap)
+        String amdMessage1 = null;
+        String amdMessage2 = null;
 
-        int amd = Math.min(letterCost + findAMDAux(characters1, characters2, pointer1 + 1, pointer2 + 1).getTotal(), // no gaps
-                Math.min(GAP_PENALTY + findAMDAux(characters1, characters2, pointer1 + 1, pointer2).getTotal(), // gap in message 2
-                        GAP_PENALTY + findAMDAux(characters1, characters2, pointer1, pointer2 + 1).getTotal())); // gap in message 1
+        if (amdCost == (noGap.getAmd() + noGapCost)) {
+            amdMessage1 = characters1[pointer1] + noGap.getMessage1();
+            amdMessage2 = characters2[pointer2] + noGap.getMessage2();
+        } else if (amdCost == (gapInFirst.getAmd() + GAP_PENALTY)) {
+            amdMessage1 = "_" + gapInFirst.getMessage1();
+            amdMessage2 = characters2[pointer2] + gapInFirst.getMessage2();
+        } else if (amdCost == (gapInSecond.getAmd() + GAP_PENALTY)) {
+            amdMessage1 = characters1[pointer1] + gapInSecond.getMessage1();
+            amdMessage2 = "_" + gapInSecond.getMessage2();
+        }
 
-        cache[characters1.length - pointer1 - 1][characters2.length - pointer2 - 1] = amd; // cache the result
-        return amd;
+
+        amdCache[characters1.length - pointer1 - 1][characters2.length - pointer2 - 1] = amdCost; // cache the result
+        message1Cache[characters1.length - pointer1 - 1][characters2.length - pointer2 - 1] = amdMessage1; // cache the result
+        message2Cache[characters1.length - pointer1 - 1][characters2.length - pointer2 - 1] = amdMessage2; // cache the result
+        return new Triplet(amdMessage1, amdMessage2, amdCost);
     }
 
-    private static Integer getFromCache(int s1, int s2) {
-        return cache[s1 - 1][s2 - 1];
+    private static Triplet getFromCache(int s1, int s2) {
+        int result = amdCache[s1 - 1][s2 - 1];
+        if (result != -1)
+            return new Triplet(message1Cache[s1 - 1][s2 - 1], message2Cache[s1 - 1][s2 - 1], result);
+        return null;
+    }
+
+    static String getGapsString(int numOfGaps) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < numOfGaps; i++)
+            builder.append("_");
+        return builder.toString();
+    }
+
+    static String getStringFromCharacters(char[] characters, int pointer) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = pointer; i < characters.length; i++) {
+            builder.append(characters[i]);
+        }
+        return builder.toString();
     }
 }
