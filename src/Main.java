@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         // Read the file lines and store them in the sequences array
         ArrayList<String> sequences = new ArrayList<>();
-        File sequencesFile = new File(System.getProperty("user.dir") + "/sequences.txt");
+        File sequencesFile = new File(System.getProperty("user.dir") + "/input2.txt");
         try (BufferedReader br = new BufferedReader(new FileReader(sequencesFile))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -31,7 +31,11 @@ public class Main {
         cache = new int[s1.length()][s2.length()];
         for (int[] a : cache)
             Arrays.fill(a, -1);
-        System.out.println(findAMD(s1, s2));
+
+        long startTime = System.currentTimeMillis();
+        int result = findAMD(s1, s2);
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        System.out.printf("AMD Penalty: %d\n Elapsed Time: %d ms\n%n", result, elapsedTime);
     }
 
     private static int findAMD(String message1, String message2) {
