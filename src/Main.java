@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         // Read the file lines and store them in the sequences array
         ArrayList<String> sequences = new ArrayList<>();
-        File sequencesFile = new File(System.getProperty("user.dir") + "/sequences.txt");
+        File sequencesFile = new File(System.getProperty("user.dir") + "/input1.txt");
         try (BufferedReader br = new BufferedReader(new FileReader(sequencesFile))) {
             String line;
             while ((line = br.readLine()) != null) {
